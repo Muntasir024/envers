@@ -1,9 +1,6 @@
 package com.example.envers.repository;
 
-import com.example.envers.model.EntityRev;
-import com.example.envers.model.Product;
-import com.example.envers.model.ProductAudit;
-import com.example.envers.model.Revision;
+import com.example.envers.model.*;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -57,5 +54,43 @@ public class GenericRevisionRepository<T> {
                 .getResultList();
 
         return auditData;
+    }
+
+    public List<ProductDifference> getProductDifferences(Long productId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<ProductDifference> differences = new ArrayList<>();
+
+        // Get all revisions of the Product entity
+        List<Number> revisions = auditReader.getRevisions(Product.class, productId);
+
+        for (int i = 1; i < revisions.size(); i++) {
+            // Get previous and current versions
+            Product previousVersion = auditReader.find(Product.class, productId, revisions.get(i - 1));
+            Product currentVersion = auditReader.find(Product.class, productId, revisions.get(i));
+
+            // Calculate and add the differences
+            differences.add(calculateDifference(previousVersion, currentVersion, revisions.get(i)));
+        }
+        return differences;
+    }
+
+    private ProductDifference calculateDifference(Product previous, Product current, Number revisionId) {
+        ProductDifference difference = new ProductDifference();
+        difference.setRevisionId(revisionId);
+
+        if (!previous.getName().equals(current.getName())) {
+            difference.addDifference("name", previous.getName(), current.getName());
+        }
+        if (!previous.getSku().equals(current.getSku())) {
+            difference.addDifference("sku", previous.getSku(), current.getSku());
+        }
+        if (!previous.getQuantity().equals(current.getQuantity())) {
+            difference.addDifference("quantity", previous.getQuantity(), current.getQuantity());
+        }
+        if (!previous.getPrice().equals(current.getPrice())) {
+            difference.addDifference("price", previous.getPrice(), current.getPrice());
+        }
+
+        return difference;
     }
 }

@@ -2,6 +2,7 @@ package com.example.envers.controller;
 
 import com.example.envers.model.EntityRev;
 import com.example.envers.model.Product;
+import com.example.envers.model.ProductDifference;
 import com.example.envers.repository.GenericRevisionRepository;
 import com.example.envers.service.ProductService;
 import com.example.envers.utill.AuditContext;
@@ -47,6 +48,8 @@ public class ProductController {
         Product productObject = productService.findBySku(product.getSku());
         if(productObject.getQuantity() != null)
             productObject.setQuantity(product.getQuantity());
+        if(productObject.getPrice() != null)
+            productObject.setPrice(product.getPrice());
         AuditContext.setUsername(username);
         Authentication auth = new UsernamePasswordAuthenticationToken(username, null, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -105,5 +108,10 @@ public class ProductController {
             System.out.println("---------------------------------");
         }
 //        return genericRevisionRepository.getAllProductAudits();
+    }
+
+    @RequestMapping("/getProductDifferences/{id}")
+    public List<ProductDifference> getProductDifferences(@PathVariable Long id) {
+        return genericRevisionRepository.getProductDifferences(id);
     }
 }
