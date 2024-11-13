@@ -28,25 +28,29 @@ public class ProductController {
     @Autowired
     private GenericRevisionRepository genericRevisionRepository;
 
-    @RequestMapping(value = "/saveProduct/{username}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/saveProduct/{username}", method = RequestMethod.POST)
     public ResponseEntity<Product> saveProduct(@RequestBody Product product, @PathVariable String username) {
         Product productObject = productService.findBySku(product.getSku());
         if(productObject != null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else {
-            Authentication auth = new UsernamePasswordAuthenticationToken(username, null, null);
             AuditContext.setUsername(username);
+            Authentication auth = new UsernamePasswordAuthenticationToken(username, null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            return new ResponseEntity<Product>(productService.save(product), HttpStatus.OK);
+
+            return new ResponseEntity<>(productService.save(product), HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "/updateProduct", method = RequestMethod.PUT)
-    public ResponseEntity<Product> updateProduct(@RequestBody Product product) {
+    @RequestMapping(value = "/updateProduct/{username}", method = RequestMethod.PUT)
+    public ResponseEntity<Product> updateProduct(@RequestBody Product product, @PathVariable String username) {
         Product productObject = productService.findBySku(product.getSku());
         if(productObject.getQuantity() != null)
             productObject.setQuantity(product.getQuantity());
-        return new ResponseEntity<Product>(productService.save(productObject), HttpStatus.OK);
+        AuditContext.setUsername(username);
+        Authentication auth = new UsernamePasswordAuthenticationToken(username, null, null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        return new ResponseEntity<>(productService.save(productObject), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/updatePrice", method = RequestMethod.PUT)

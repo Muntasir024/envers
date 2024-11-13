@@ -1,6 +1,7 @@
 package com.example.envers.listener;
 
 import com.example.envers.model.Revision;
+import com.example.envers.utill.AuditContext;
 import org.hibernate.envers.RevisionListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,8 +17,9 @@ public class EntityRevisionListener implements RevisionListener {
         Object principal = auth.getPrincipal();
         Object details = auth.getDetails();
 
-        if (principal instanceof UserDetails)
-            revision.setUsername(((UserDetails) principal).getUsername());
+//        if (principal instanceof UserDetails)
+//            revision.setUsername(((UserDetails) principal).getUsername());
+        revision.setUsername(AuditContext.getUsername());
 
         if (details instanceof WebAuthenticationDetails)
             revision.setIp(((WebAuthenticationDetails) details).getRemoteAddress());
