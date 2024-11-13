@@ -1,6 +1,7 @@
 package com.example.envers.repository;
 
 import com.example.envers.model.*;
+import com.example.envers.utill.AuditContext;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -60,15 +61,12 @@ public class GenericRevisionRepository<T> {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<ProductDifference> differences = new ArrayList<>();
 
-        // Get all revisions of the Product entity
         List<Number> revisions = auditReader.getRevisions(Product.class, productId);
 
         for (int i = 1; i < revisions.size(); i++) {
-            // Get previous and current versions
             Product previousVersion = auditReader.find(Product.class, productId, revisions.get(i - 1));
             Product currentVersion = auditReader.find(Product.class, productId, revisions.get(i));
 
-            // Calculate and add the differences
             differences.add(calculateDifference(previousVersion, currentVersion, revisions.get(i)));
         }
         return differences;
@@ -77,6 +75,12 @@ public class GenericRevisionRepository<T> {
     private ProductDifference calculateDifference(Product previous, Product current, Number revisionId) {
         ProductDifference difference = new ProductDifference();
         difference.setRevisionId(revisionId);
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        Revision revision = auditReader.findRevision(Revision.class, revisionId);
+        difference.setRevisionId(revisionId);
+
+        difference.setUsername(revision.getUsername());
+        difference.setTimestamp(revision.getRevisionDate());
 
         if (!previous.getName().equals(current.getName())) {
             difference.addDifference("name", previous.getName(), current.getName());

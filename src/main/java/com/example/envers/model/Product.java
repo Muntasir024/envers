@@ -1,10 +1,12 @@
 package com.example.envers.model;
 
+import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Audited
+@AuditTable(value = "product_audit")
 @Entity
 public class Product {
     @Id
