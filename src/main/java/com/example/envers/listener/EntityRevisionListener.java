@@ -17,7 +17,7 @@ public class EntityRevisionListener implements RevisionListener {
         Object details = auth.getDetails();
 
         if (principal instanceof UserDetails)
-            revision.setUser(((UserDetails) principal).getUsername());
+            revision.setUsername(((UserDetails) principal).getUsername());
 
         if (details instanceof WebAuthenticationDetails)
             revision.setIp(((WebAuthenticationDetails) details).getRemoteAddress());

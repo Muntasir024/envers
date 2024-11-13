@@ -2,15 +2,18 @@ package com.example.envers.controller;
 
 import com.example.envers.model.EntityRev;
 import com.example.envers.model.Product;
-import com.example.envers.model.ProductAudit;
 import com.example.envers.repository.GenericRevisionRepository;
 import com.example.envers.service.ProductService;
+import com.example.envers.utill.AuditContext;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,12 +28,15 @@ public class ProductController {
     @Autowired
     private GenericRevisionRepository genericRevisionRepository;
 
-    @RequestMapping(value = "/saveProduct", method = RequestMethod.PUT)
-    public ResponseEntity<Product> saveProduct(@RequestBody Product product) {
+    @RequestMapping(value = "/saveProduct/{username}", method = RequestMethod.PUT)
+    public ResponseEntity<Product> saveProduct(@RequestBody Product product, @PathVariable String username) {
         Product productObject = productService.findBySku(product.getSku());
         if(productObject != null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else {
+            Authentication auth = new UsernamePasswordAuthenticationToken(username, null, null);
+            AuditContext.setUsername(username);
+            SecurityContextHolder.getContext().setAuthentication(auth);
             return new ResponseEntity<Product>(productService.save(product), HttpStatus.OK);
         }
     }
