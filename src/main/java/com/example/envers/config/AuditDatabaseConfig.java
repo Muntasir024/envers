@@ -37,8 +37,8 @@ public class AuditDatabaseConfig {
             @Qualifier("primaryDataSource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         localContainerEntityManagerFactoryBean.setDataSource(dataSource);
-        localContainerEntityManagerFactoryBean.setPersistenceUnitName("primary");
-        localContainerEntityManagerFactoryBean.setPackagesToScan("com.example.envers.model");
+        localContainerEntityManagerFactoryBean.setPersistenceUnitName("product");
+        localContainerEntityManagerFactoryBean.setPackagesToScan("com.example.envers.model.product");
         return localContainerEntityManagerFactoryBean;
     }
 
@@ -48,8 +48,8 @@ public class AuditDatabaseConfig {
             @Qualifier("auditDataSource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         localContainerEntityManagerFactoryBean.setDataSource(dataSource);
-        localContainerEntityManagerFactoryBean.setPersistenceUnitName("audit");
-        localContainerEntityManagerFactoryBean.setPackagesToScan("org.hibernate.envers");
+        localContainerEntityManagerFactoryBean.setPersistenceUnitName("product_audit");
+        localContainerEntityManagerFactoryBean.setPackagesToScan("com.example.envers.model.product");
         return localContainerEntityManagerFactoryBean;
     }
 

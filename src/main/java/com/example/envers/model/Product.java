@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Audited
 @AuditTable(value = "product_audit")
-@Entity
+@Entity(name = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "product_Sequence")
